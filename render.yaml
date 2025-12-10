@@ -3,4 +3,4 @@ services:
     name: jeff-ticket-bot
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python main.py"
+    startCommand: "python main2.py
