@@ -31,3 +31,6 @@ async def ticket_checker():
             await channel.send(CHECK_URL)
 
 bot.run(TOKEN)
+@bot.command()
+async def ping(ctx):
+    await ctx.send("pong!")
