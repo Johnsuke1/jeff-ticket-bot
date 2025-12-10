@@ -11,7 +11,7 @@ intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 def check_ticket():
-    res = requests.get(CHECK_URL, timeout=10)
+    res = requests.get(CHECK_URL, timeout=30)
     text = res.text
     keywords = ["受付中", "〇", "残り", "購入"]
     return any(k in text for k in keywords)
