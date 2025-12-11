@@ -1,5 +1,6 @@
 import os
-import requests
+import aiohttp
+import asyncio
 import discord
 from discord.ext import tasks, commands
 
@@ -10,11 +11,19 @@ CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-def check_ticket():
-    res = requests.get(CHECK_URL, timeout=30)
-    text = res.text
-    keywords = ["受付中", "〇", "残り", "購入"]
-    return any(k in text for k in keywords)
+async def check_ticket():
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(CHECK_URL, timeout=10) as res:
+                text = await res.text()
+                keywords = ["受付中", "〇", "残り", "購入"]
+                return any(k in text for k in keywords)
+        except asyncio.TimeoutError:
+            print("Timeout…")
+            return False
+        except Exception as e:
+            print(f"Error: {e}")
+            return False
 
 @bot.event
 async def on_ready():
@@ -23,7 +32,8 @@ async def on_ready():
 
 @tasks.loop(minutes=1)
 async def ticket_checker():
-    if check_ticket():
+    result = await check_ticket()
+    if result:
         channel = bot.get_channel(CHANNEL_ID)
         if channel:
             await channel.send("🎫 **ジェフ自由席が再販されたぞ！急げ！**")
